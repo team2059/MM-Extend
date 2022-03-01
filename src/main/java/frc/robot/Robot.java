@@ -79,10 +79,10 @@ import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 public class Robot extends TimedRobot {
 
 	// setpoints in encoder ticks
-	double masterTargetMin = 500;
+	double masterTargetMin = 10000;
 	double masterTargetMax = 55000;
 
-	double followerTargetMin = 500;
+	double followerTargetMin = 10000;
 	double followerTargetMax = 55000;
 
 	/* Hardware */
@@ -136,8 +136,8 @@ public class Robot extends TimedRobot {
 		masterTalon.setSensorPhase(true);
 		masterTalon.setInverted(false);
 
-		followTalon.setNeutralMode(NeutralMode.Brake);
-		masterTalon.setNeutralMode(NeutralMode.Brake);
+		// followTalon.setNeutralMode(NeutralMode.Brake);
+		// masterTalon.setNeutralMode(NeutralMode.Brake);
 
 		/* Set relevant frame periods to be at least as fast as periodic rate */
 		masterTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 10, Constants.kTimeoutMs);
@@ -157,8 +157,8 @@ public class Robot extends TimedRobot {
 		masterTalon.config_kD(Constants.kSlotIdx, Constants.masterGains.kD, Constants.kTimeoutMs);
 
 		/* Set acceleration and vcruise velocity - see documentation */
-		masterTalon.configMotionCruiseVelocity(1091, Constants.kTimeoutMs);
-		masterTalon.configMotionAcceleration(1090.8, Constants.kTimeoutMs);
+		masterTalon.configMotionCruiseVelocity(1889, Constants.kTimeoutMs);
+		masterTalon.configMotionAcceleration(1889.1, Constants.kTimeoutMs);
 
 		masterTalon.configFeedbackNotContinuous(true, Constants.kTimeoutMs);
 
@@ -194,8 +194,8 @@ public class Robot extends TimedRobot {
 		followTalon.config_kD(Constants.kSlotIdx, Constants.followerGains.kD, Constants.kTimeoutMs);
 
 		/* Set acceleration and vcruise velocity - see documentation */
-		followTalon.configMotionCruiseVelocity(1091, Constants.kTimeoutMs);
-		followTalon.configMotionAcceleration(1090.8, Constants.kTimeoutMs);
+		followTalon.configMotionCruiseVelocity(1889, Constants.kTimeoutMs);
+		followTalon.configMotionAcceleration(1889.1, Constants.kTimeoutMs);
 
 		followTalon.configFeedbackNotContinuous(true, Constants.kTimeoutMs);
 
@@ -215,7 +215,13 @@ public class Robot extends TimedRobot {
 	 * This function is called periodically during operator control
 	 */
 	public void teleopPeriodic() {
-		SmartDashboard.putString("talon mode", masterTalon.getControlMode().toString());
+		SmartDashboard.putString("left talon mode", masterTalon.getControlMode().toString());
+		SmartDashboard.putString("right talon mode", followTalon.getControlMode().toString());
+		SmartDashboard.putNumber("left encoder ticks", masterTalon.getSelectedSensorPosition());
+
+		// SmartDashboard.putString("right talon mode",
+		// masterTalon.getControlMode().toString());
+		SmartDashboard.putNumber("right encoder ticks", followTalon.getSelectedSensorPosition());
 		/* Get gamepad axis - forward stick is positive */
 		double leftYstick = -1.0 * logitech.getLeftY(); /* left-side Y for Xbox360Gamepad */
 		double rightYstick = -1.0 * logitech.getRightY(); /* right-side Y for Xbox360Gamepad */
@@ -275,7 +281,9 @@ public class Robot extends TimedRobot {
 			_sb.append("\terr:");
 			_sb.append(masterTalon.getClosedLoopError(Constants.kPIDLoopIdx));
 			_sb.append("\ttrg:");
-			_sb.append(masterTargetMin);
+			_sb.append(followerTargetMax);
+
+			_sb.append(followTalon.getClosedLoopError(Constants.kPIDLoopIdx));
 
 		} else {
 			/* Percent Output */
@@ -283,8 +291,8 @@ public class Robot extends TimedRobot {
 			masterTalon.set(ControlMode.PercentOutput, leftYstick);
 			followTalon.set(ControlMode.PercentOutput, rightYstick);
 
-			masterTalon.setNeutralMode(NeutralMode.Brake);
-			followTalon.setNeutralMode(NeutralMode.Brake);
+			// masterTalon.setNeutralMode(NeutralMode.Brake);
+			// followTalon.setNeutralMode(NeutralMode.Brake);
 		}
 		// if (logitech.getRawButton(2)) {
 		// /* Zero sensor positions */
